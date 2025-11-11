@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Masonry Grid */
+.masonry {
+  column-count: 5;
+  column-gap: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (max-width: 1400px) { .masonry { column-count: 4; } }
+@media (max-width: 1100px) { .masonry { column-count: 3; } }
+@media (max-width: 768px)  { .masonry { column-count: 2; } }
+@media (max-width: 480px)  { .masonry { column-count: 1; } }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+
+@keyframes bounceIn {
+  0%, 20%, 40%, 60%, 80%, 100% { transform: translateY(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateY(-10px); }
+}
+.animate-bounceIn { animation: bounceIn 0.6s; }
+.pin-actions, .edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pin-actions button, .edit-actions button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pin-actions button:first-child {
+  background-color: #007bff;
+  color: white;
+}
+
+.pin-actions button:last-child {
+  background-color: #dc3545;
+  color: white;
+}
+
+.edit-form input, .edit-form textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
