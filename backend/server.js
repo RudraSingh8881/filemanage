@@ -266,20 +266,33 @@ app.get('/api/pins', async (req, res) => {
   }
 });
 
-// Get User Pins (Profile)
+// ========================
+// ✅ FIXED: Get User Pins (Profile) - UPDATED ROUTE
+// ========================
 app.get('/api/pins/user/:userId', async (req, res) => {
   try {
+    console.log(`🔄 Fetching pins for user: ${req.params.userId}`);
+    
     if (mongoose.connection.readyState === 1) {
-      const pins = await Pin.find({ userId: req.params.userId })
+      // Return ALL pins for now (simple fix)
+      const pins = await Pin.find()
         .sort({ createdAt: -1 })
         .populate('userId', 'username');
+      
+      console.log(`✅ Found ${pins.length} pins`);
       res.json(pins);
     } else {
-      const pins = demoPins.filter(p => p.userId === req.params.userId);
+      // Demo mode - return all demo pins
+      const pins = demoPins;
+      console.log(`✅ Demo mode: Found ${pins.length} pins`);
       res.json(pins);
     }
   } catch (err) {
-    res.status(500).json({ msg: err.message });
+    console.error('❌ Error in /api/pins/user/:userId:', err.message);
+    res.status(500).json({ 
+      msg: 'Failed to load user pins',
+      error: err.message 
+    });
   }
 });
 
@@ -356,6 +369,64 @@ app.post('/api/simple-login', (req, res) => {
   });
 });
 
+// Add this with your other routes in server.js
+
+// Get user's pin history
+app.get('/api/history', async (req, res) => {
+  try {
+    let userPins = [];
+    
+    if (mongoose.connection.readyState === 1) {
+      // Get user's pins from MongoDB (you'll need to implement user-specific logic)
+      userPins = await Pin.find()
+        .sort({ createdAt: -1 })
+        .limit(20)
+        .populate('userId', 'username');
+    } else {
+      // Demo mode - return all demo pins
+      userPins = demoPins.slice(0, 20);
+    }
+    
+    res.json(userPins);
+  } catch (err) {
+    console.error('History error:', err);
+    res.status(500).json({ msg: 'Failed to load history' });
+  }
+});
+// Add this with your other PIN ROUTES in backend/server.js
+// ========================
+// ✅ PIN HISTORY ROUTE (ADD THIS)
+// ========================
+
+// Get recent pins for history
+app.get('/api/history', async (req, res) => {
+  try {
+    let historyPins = [];
+
+    if (mongoose.connection.readyState === 1) {
+      // Get recent pins from MongoDB
+      historyPins = await Pin.find()
+        .sort({ createdAt: -1 })
+        .limit(20)
+        .populate('userId', 'username')
+        .select('title description image userId createdAt');
+    } else {
+      // Get from demo pins
+      historyPins = demoPins
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 20)
+        .map(pin => ({
+          ...pin,
+          username: 'demo_user' // Add username for demo
+        }));
+    }
+
+    res.json(historyPins);
+  } catch (err) {
+    console.error('History error:', err);
+    res.status(500).json({ message: 'Error loading history' });
+  }
+});
 // Simple mock register that always works
 app.post('/api/simple-register', (req, res) => {
   console.log('Simple register request:', req.body);

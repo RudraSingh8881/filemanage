@@ -1,4 +1,3 @@
-// frontend/src/context/AuthContext.jsx - ✅ UPDATED
 import React, { createContext, useState, useEffect } from 'react';
 import API from '../utils/api';
 
@@ -12,7 +11,12 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
+      const userData = JSON.parse(savedUser);
+      setUser(userData);
+      // Also store userId separately for consistency
+      if (userData.id) {
+        localStorage.setItem('userId', userData.id);
+      }
     }
     setLoading(false);
   }, []);
@@ -21,28 +25,36 @@ export const AuthProvider = ({ children }) => {
     try {
       const userData = await API.loginUser(email, password);
       setUser(userData);
-      // Redirect will be handled in the component
+      // Store userId separately for easy access
+      if (userData.id) {
+        localStorage.setItem('userId', userData.id);
+      }
       return userData;
     } catch (err) {
       throw new Error('Login failed');
     }
   };
 
-  // This swallows the error - DON'T DO THIS
-const register = async (username, email, password) => {
-  try {
-    const response = await registerUser(username, email, password);
-    localStorage.setItem('token', response.data.token);
-    setUser(response.data.user);
-  } catch (error) {
-    console.log(error); // Error doesn't get passed to Register.jsx
-  }
-};
+  // ✅ FIXED: Proper error handling and using API.registerUser
+  const register = async (username, email, password) => {
+    try {
+      const userData = await API.registerUser(username, email, password);
+      setUser(userData);
+      // Store userId separately for easy access
+      if (userData.id) {
+        localStorage.setItem('userId', userData.id);
+      }
+      return userData;
+    } catch (error) {
+      // Re-throw the error so Register.jsx can handle it
+      throw error;
+    }
+  };
 
   const logout = () => {
     API.logoutUser();
+    localStorage.removeItem('userId'); // Clean up userId too
     setUser(null);
-    // Redirect will be handled in the component
   };
 
   return (
