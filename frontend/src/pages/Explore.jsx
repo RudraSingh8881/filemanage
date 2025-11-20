@@ -1,4 +1,4 @@
-// src/pages/Explore.jsx ← FIXED: FETCHES ACTUAL IMAGE SIZES
+// src/pages/Explore.jsx ← FIXED: No more DataCloneError
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../utils/api';
@@ -25,7 +25,7 @@ const formatSize = (bytes) => {
 
 const buildImageUrl = (path) => `${BACKEND}${path}`;
 
-// NEW: Function to fetch image size from URL
+// Function to fetch image size from URL
 const fetchImageSize = async (imageUrl) => {
   try {
     const response = await fetch(imageUrl, { method: 'HEAD' });
@@ -42,17 +42,6 @@ const fetchImageSize = async (imageUrl) => {
 
 /* ---------- Masonry Grid ---------- */
 const MasonryGrid = ({ pins, onEdit, onDelete }) => {
-  // Debug: Log pin data to see what's available
-  console.log('📌 Pin data:', pins.map(pin => ({
-    id: pin._id,
-    title: pin.title,
-    isCompressed: pin.isCompressed,
-    compressedSize: pin.compressedSize,
-    size: pin.size,
-    actualSize: pin.actualSize, // NEW
-    hasSize: !!(pin.size || pin.compressedSize || pin.actualSize) // UPDATED
-  })));
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
       {pins.map((pin, i) => {
@@ -60,7 +49,7 @@ const MasonryGrid = ({ pins, onEdit, onDelete }) => {
         let displaySize = 0;
         let isCompressed = pin.isCompressed;
         
-        // UPDATED: Priority order for size display
+        // Priority order for size display
         if (pin.isCompressed) {
           displaySize = pin.compressedSize || pin.actualSize || pin.size || 0;
         } else {
@@ -151,9 +140,8 @@ const Explore = () => {
     setLoading(true);
     try {
       const res = await API.getPins(query, pageNum);
-      console.log('🔍 API Response:', res);
       
-      // NEW: Process pins and fetch actual sizes for those missing size data
+      // Process pins and fetch actual sizes for those missing size data
       const pinsWithSizes = await Promise.all(
         (res.pins || []).map(async (p) => {
           const pinData = {
@@ -163,7 +151,7 @@ const Explore = () => {
             size: p.size || 0,
             compressedSize: p.compressedSize || 0,
             isCompressed: p.isCompressed || false,
-            actualSize: 0 // NEW: Initialize actual size
+            actualSize: 0 // Initialize actual size
           };
 
           // If backend doesn't provide size data, fetch it from the image
@@ -180,14 +168,6 @@ const Explore = () => {
           return pinData;
         })
       );
-      
-      console.log('📊 Processed pins:', pinsWithSizes.map(p => ({
-        title: p.title,
-        size: p.size,
-        compressedSize: p.compressedSize,
-        actualSize: p.actualSize, // NEW
-        isCompressed: p.isCompressed
-      })));
 
       const sorted = [...pinsWithSizes].sort((a, b) => {
         if (!a.isCompressed && b.isCompressed) return -1;
@@ -249,8 +229,20 @@ const Explore = () => {
     }
   };
 
+  // FIXED: Only pass serializable data in navigation state
   const handleEdit = (pin) => {
-    navigate('/create', { state: { reusePin: pin } });
+    navigate('/create', { 
+      state: { 
+        reusePin: {
+          _id: pin._id,
+          title: pin.title,
+          description: pin.description,
+          image: pin.image,
+          destination: pin.destination,
+          // Only include primitive data, no functions or complex objects
+        }
+      } 
+    });
   };
 
   const handleDelete = async (pinId) => {

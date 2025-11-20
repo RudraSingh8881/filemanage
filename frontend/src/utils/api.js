@@ -75,6 +75,7 @@ export const getHistory = async () => {
   return res.data;
 };
 
+
 // Default export
 const API = {
   loginUser,

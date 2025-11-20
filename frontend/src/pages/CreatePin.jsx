@@ -5,9 +5,14 @@ import API from '../utils/api';
 import { Upload, Camera, AlertCircle } from 'lucide-react';
 import CompressPin from '../components/CompressPin';
 
+
+
+
+
 const CreatePin = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const editPin = location.state?.reusePin;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
