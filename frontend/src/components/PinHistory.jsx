@@ -4,6 +4,8 @@ import { AuthContext } from '../context/AuthContext';
 import API from '../utils/api';
 import { History, RotateCcw, Trash2, X, Clock, Shield } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const PinHistory = ({ onReuse }) => {
   const { user } = useContext(AuthContext);
   const [history, setHistory] = useState([]);
@@ -144,8 +146,8 @@ const PinHistory = ({ onReuse }) => {
                   onClick={() => handleReuse(pin)}
                 >
                   <div className="relative">
-                    <img
-                      src={`http://localhost:5000${pin.image}`}
+                    <img                      
+                    src={`${API_URL}${pin.image}`}
                       alt={pin.title}
                       className="w-full h-32 object-cover rounded-t-xl"
                       onError={(e) => {

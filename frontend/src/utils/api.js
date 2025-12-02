@@ -31,6 +31,7 @@ const uploadApi = axios.create({
 export const loginUser = async (email, password) => {
   const res = await api.post('/login', { email, password });
   localStorage.setItem('token', res.data.token);
+  localStorage.setItem('userId', res.data.user.id); // Add this
   localStorage.setItem('user', JSON.stringify(res.data.user));
   return res.data.user;
 };
@@ -38,6 +39,7 @@ export const loginUser = async (email, password) => {
 export const registerUser = async (username, email, password) => {
   const res = await api.post('/register', { username, email, password });
   localStorage.setItem('token', res.data.token);
+  localStorage.setItem('userId', res.data.user.id); // Add this
   localStorage.setItem('user', JSON.stringify(res.data.user));
   return res.data.user;
 };
