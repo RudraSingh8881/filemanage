@@ -1,0 +1,32 @@
+# Template render.yaml for two services (backend + frontend).
+# Replace <REPO> with your repository full git URL if you want to use this file
+# with Render's `Create new service from spec` feature. Otherwise use the
+# steps in README_DEPLOY.md to configure via the Render dashboard.
+
+services:
+  - type: web
+    name: pinterest-backend
+    env: node
+    plan: free
+    repo: <REPO>
+    branch: main
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: MONGODB_URI
+      - key: JWT_SECRET
+      - key: FRONTEND_URL
+
+  - type: static_site
+    name: pinterest-frontend
+    plan: free
+    repo: <REPO>
+    branch: main
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+
+# Notes:
+# - Replace `<REPO>` with the repo URL or remove the field if you're creating
+#   services via the dashboard and connecting your GitHub account there.
