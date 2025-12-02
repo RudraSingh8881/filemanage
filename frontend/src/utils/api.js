@@ -1,12 +1,19 @@
 // src/utils/api.js - FINAL CORRECTED VERSION (NO DEMO FALLBACKS)
 import axios from 'axios';
 
+// Use Vite environment variable `VITE_API_URL` when deployed.
+// If not set, fall back to a relative `/api` so the app works when
+// frontend and backend are hosted on the same origin.
+const baseFromEnv = import.meta.env.VITE_API_URL || '';
+const normalizedBase = baseFromEnv ? baseFromEnv.replace(/\/+$/, '') : '';
+const apiBase = normalizedBase ? `${normalizedBase}/api` : '/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: apiBase,
 });
 
 const uploadApi = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: apiBase,
 });
 
 // Request interceptors
