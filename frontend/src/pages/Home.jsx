@@ -63,7 +63,7 @@ const Home = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this pin?')) return;
+    if (!confirm('Delete this file?')) return;
     try {
       await deletePin(id);
       setPins(pins.filter(p => p._id !== id));
@@ -85,7 +85,7 @@ const Home = () => {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
         <div className="text-3xl font-bold text-purple-600 flex items-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          Loading pins...
+          Loading files...
         </div>
       </div>
     );
@@ -98,9 +98,9 @@ const Home = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            PinHub
+            File Manager
           </h1>
-          <p className="text-2xl text-purple-600 mt-4">Discover & Create Amazing Pins</p>
+          <p className="text-2xl text-purple-600 mt-4">Discover & Create Amazing Files</p>
 
           {compressedPinsCount > 0 && (
             <div className="mt-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-4 max-w-md mx-auto border border-green-200">
@@ -108,7 +108,7 @@ const Home = () => {
                 <Image className="text-green-600" size={24} />
                 <div>
                   <p className="text-green-700 font-bold">
-                    {compressedPinsCount} Optimized Pins
+                    {compressedPinsCount} Optimized Files
                   </p>
                   <p className="text-green-600 text-sm">
                     {pins.length - compressedPinsCount} regular • {compressedPinsCount} compressed

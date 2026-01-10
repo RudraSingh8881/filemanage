@@ -216,24 +216,24 @@ const Navbar = () => {
               <Search size={24} />
             </Link>
 
-            {/* CREATE PIN */}
+            {/* CREATE FILE */}
             {user && (
               <Link 
                 to="/create" 
                 className="p-2 hover:bg-gray-100 rounded-full transition hover:scale-110"
-                title="Create Pin"
+                title="Create File"
               >
                 <Plus size={24} />
               </Link>
             )}
 
-            {/* PIN HISTORY DROPDOWN WITH SEARCH */}
+            {/* FILE HISTORY DROPDOWN WITH SEARCH */}
             {user && (
               <div className="relative">
                 <button
                   onClick={() => setShowHistory(!showHistory)}
                   className="p-2 hover:bg-gray-100 rounded-full transition hover:scale-110 relative group"
-                  title="Pin History"
+                  title="File History"
                 >
                   <History size={24} />
                   {history.length > 0 && (
@@ -258,7 +258,7 @@ const Navbar = () => {
                     />
                     <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-purple-100 p-4 z-50 animate-fadeIn">
                       <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-bold text-purple-700 text-lg">Pin History</h3>
+                        <h3 className="font-bold text-purple-700 text-lg">File History</h3>
                         <div className="flex gap-2">
                           {history.length > 0 && (
                             <button
@@ -291,7 +291,7 @@ const Navbar = () => {
                               Protected History
                             </p>
                             <p className="text-xs text-green-600">
-                              Pins remain here even if deleted from main pages
+                              Files remain here even if deleted from main pages
                             </p>
                           </div>
                         </div>
@@ -302,7 +302,7 @@ const Navbar = () => {
                         <div className="flex items-center gap-2">
                           <RotateCcw size={12} className="text-blue-600" />
                           <p className="text-xs text-blue-700">
-                            Click any pin to reuse it without recreating from scratch
+                            Click any file to reuse it without recreating from scratch
                           </p>
                         </div>
                       </div>
@@ -332,11 +332,11 @@ const Navbar = () => {
                         <div className="text-center py-8">
                           <History size={48} className="mx-auto text-gray-300 mb-3" />
                           <p className="text-gray-500">
-                            {searchQuery ? 'No pins match your search' : 'No history yet'}
+                            {searchQuery ? 'No files match your search' : 'No history yet'}
                           </p>
                           {!searchQuery && (
                             <p className="text-sm text-gray-400 mt-1">
-                              Your recently viewed pins will appear here
+                              Your recently viewed files will appear here
                             </p>
                           )}
                         </div>
@@ -344,7 +344,7 @@ const Navbar = () => {
                         <div className="space-y-3 max-h-80 overflow-y-auto">
                           <div className="flex justify-between items-center px-1">
                             <p className="text-xs text-gray-500">
-                              {filteredHistory.length} protected pins
+                              {filteredHistory.length} protected files
                             </p>
                             <p className="text-xs text-purple-600">
                               Click to reuse • 🗑️ Remove from history

@@ -395,7 +395,7 @@ const Profile = () => {
       await loadProfileStats();
       cancelDelete();
     } catch (err) {
-      alert('Failed to delete pin');
+      alert('Failed to delete file');
     }
   };
 
@@ -403,7 +403,7 @@ const Profile = () => {
   const getSuccessMessage = () => {
     switch (activeStat) {
       case 'totalPins':
-        return `You have ${profileStats.totalPins} total pins in your collection!`;
+        return `You have ${profileStats.totalPins} total files in your collection!`;
       case 'editProfile':
         return 'Redirecting to update profile...';
       case 'shareProfile':
@@ -516,7 +516,7 @@ const Profile = () => {
               </div>
               <div className="text-gray-600 font-medium flex items-center justify-center gap-2 group-hover:text-purple-700 transition-colors text-lg sm:text-xl">
                 <MapPin size={18} />
-                Total Pins
+                Total Files
               </div>
               <div className="text-xs text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 Click to view details

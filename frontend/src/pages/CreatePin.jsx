@@ -24,7 +24,7 @@ const CreatePin = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Please login first to create pins');
+      alert('Please login first to create files');
       navigate('/login');
       return;
     }
@@ -71,7 +71,7 @@ const CreatePin = () => {
       return;
     }
     if (!title.trim()) {
-      setError('Please enter a title for your pin');
+      setError('Please enter a title for your file');
       return;
     }
     setLoading(true);
@@ -109,13 +109,13 @@ const CreatePin = () => {
           const file = new File([blob], fileName, { type: 'image/jpeg' });
           formData.append('image', file);
         } catch (err) {
-          setError('Failed to load image from existing pin');
+          setError('Failed to load image from existing file');
           return;
         }
       }
 
       await API.createPin(formData);
-      alert('Pin created successfully!');
+      alert('File created successfully!');
       
       // ADD THIS LINE - Trigger real-time update in Profile
       window.dispatchEvent(new Event('pinCreated'));
@@ -132,7 +132,7 @@ const CreatePin = () => {
       } else if (err.response?.status === 400) {
         setError(err.response.data?.msg || 'Invalid data. Please check your inputs.');
       } else {
-        setError('Failed to create pin. Please try again.');
+        setError('Failed to create file. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -151,7 +151,7 @@ const CreatePin = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 py-8 px-4">
       <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl p-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-purple-600">Create Pin</h1>
+        <h1 className="text-4xl font-bold text-center mb-8 text-purple-600">Create File</h1>
         
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
@@ -229,7 +229,7 @@ const CreatePin = () => {
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">Description</label>
             <textarea
               id="description"
-              placeholder="Describe your pin (optional)..."
+              placeholder="Describe your file (optional)..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows="4"
@@ -246,12 +246,12 @@ const CreatePin = () => {
             {loading ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                Creating Pin...
+                Creating File...
               </>
             ) : (
               <>
                 <Upload size={20} />
-                Create Pin
+                Create File
               </>
             )}
           </button>
