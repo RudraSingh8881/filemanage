@@ -178,8 +178,8 @@ const Explore = () => {
       setHasMore(res.hasMore === true);
       setTotalPins(res.total ?? pinsWithSizes.length);
     } catch (err) {
-      console.error('Load pins failed:', err);
-      alert('Failed to load pins – check the backend.');
+      console.error('Load files failed:', err);
+      alert('Failed to load files – check the backend.');
     } finally {
       setLoading(false);
     }
@@ -246,13 +246,13 @@ const Explore = () => {
   };
 
   const handleDelete = async (pinId) => {
-    if (!window.confirm('Delete this pin?')) return;
+    if (!window.confirm('Delete this file?')) return;
     try {
       await API.deletePin(pinId);
       setPins((prev) => prev.filter((p) => p._id !== pinId));
-      alert('Pin deleted!');
+      alert('file deleted!');
     } catch {
-      alert('Failed to delete pin.');
+      alert('Failed to delete file.');
     }
   };
 
@@ -267,7 +267,7 @@ const Explore = () => {
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-purple-500" size={24} />
             <input
               type="text"
-              placeholder="Search pins..."
+              placeholder="Search files..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-14 pr-12 py-4 text-lg rounded-full bg-white/90 border-none shadow-md focus:outline-none focus:ring-4 focus:ring-purple-200"
@@ -291,7 +291,7 @@ const Explore = () => {
             <div className="text-center mt-3">
               <p className="text-purple-700 font-medium flex items-center justify-center gap-2">
                 <Sparkles size={16} />
-                Showing {pins.length} of {totalPins} pins
+                Showing {pins.length} of {totalPins} files
                 {search && ` for "${search}"`}
                 {compressedCount > 0 && (
                   <span className="text-green-600 text-xs ml-2">
@@ -316,7 +316,7 @@ const Explore = () => {
               onClick={() => navigate('/create')}
               className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:from-purple-700 hover:to-pink-700 transition"
             >
-              <ImageIcon size={18} /> Create Pin
+              <ImageIcon size={18} /> Create File
             </button>
           </div>
         )}
@@ -328,7 +328,7 @@ const Explore = () => {
               <Search className="text-purple-500" size={48} />
             </div>
             <h3 className="text-3xl font-bold text-gray-800">
-              {search ? 'No pins found' : 'No pins yet'}
+              {search ? 'No files found' : 'No file yet'}
             </h3>
             <p className="text-lg text-gray-600 mt-2">
               {search ? 'Try different keywords.' : 'Be the first to create!'}
@@ -338,7 +338,7 @@ const Explore = () => {
                 onClick={() => navigate('/create')}
                 className="mt-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-full font-bold"
               >
-                Create First Pin
+                Create First File
               </button>
             )}
           </div>
@@ -364,7 +364,7 @@ const Explore = () => {
         {/* END */}
         {!hasMore && pins.length > 0 && (
           <div className="text-center py-8">
-            <p className="text-green-600 font-medium">All pins loaded!</p>
+            <p className="text-green-600 font-medium">All File loaded!</p>
           </div>
         )}
       </div>

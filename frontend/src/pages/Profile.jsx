@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import API from '../utils/api';
 import MasonryGrid from '../components/MasonryGrid';
-import CompressPin from '../components/CompressPin';
+import CompressPin from '../components/Compressfile';
 import { Edit2, Trash2, Loader2, Check, X, Upload, User, Mail, Calendar, Share2, MapPin, Lock, Unlock, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -245,7 +245,7 @@ const Profile = () => {
     }, 1000);
   };
 
-  // Clickable Stats Handler - Only Total Pins remains
+  // Clickable Stats Handler - Only Total files remains
   const handleTotalPinsClick = () => {
     setActiveStat('totalPins');
     setShowSuccess(true);
@@ -579,17 +579,17 @@ const Profile = () => {
         {/* PIN GRID SECTION - Only show if user is authenticated and has pins */}
         {(userId !== 'demo' && userId !== 'unknown') && (
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Pins</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Your files</h2>
             {pins.length > 0 ? (
               <MasonryGrid pins={pins} onEdit={startEdit} onDelete={confirmDelete} />
             ) : (
               <div className="text-center py-12 bg-white/50 rounded-2xl">
-                <p className="text-gray-500 text-lg">No pins yet. Create your first pin!</p>
+                <p className="text-gray-500 text-lg">No file yet. Create your first file!</p>
                 <button 
                   onClick={() => navigate('/create')}
                   className="mt-4 bg-purple-600 text-white px-6 py-2 rounded-full font-medium hover:bg-purple-700 transition"
                 >
-                  Create Pin
+                  Create file
                 </button>
               </div>
             )}

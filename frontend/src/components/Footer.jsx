@@ -17,14 +17,14 @@ const Footer = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-2xl shadow-2xl">
-                P
+                R
               </div>
               <h1 className="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                PinHub
+                FileHub
               </h1>
             </div>
             <p className="text-purple-200 text-lg leading-relaxed">
-              Where creativity meets inspiration. Save, share, and discover amazing pins from our community!
+              Where creativity meets inspiration. Save, share, and discover amazing files from our community!
             </p>
             <div className="flex gap-4 mt-6">
               <a href="#" className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/20 transition-all transform hover:scale-110 hover:shadow-lg">
@@ -61,7 +61,7 @@ const Footer = () => {
               <li>
                 <Link to="/create" className="hover:text-pink-300 transition-all flex items-center gap-2 group">
                   <Plus size={16} className="group-hover:scale-110 transition" />
-                  Create Pin
+                  Create File
                 </Link>
               </li>
               <li>
@@ -83,7 +83,7 @@ const Footer = () => {
               <li>
                 <a href="#" className="hover:text-pink-300 transition-all flex items-center gap-2 group">
                   <div className="w-2 h-2 bg-purple-400 rounded-full group-hover:scale-150 transition"></div>
-                  Pin History
+                  File History
                 </a>
               </li>
               <li>
@@ -101,7 +101,7 @@ const Footer = () => {
               <li>
                 <a href="#" className="hover:text-pink-300 transition-all flex items-center gap-2 group">
                   <div className="w-2 h-2 bg-green-400 rounded-full group-hover:scale-150 transition"></div>
-                  Reuse Pins
+                  Reuse Files
                 </a>
               </li>
             </ul>
@@ -111,7 +111,7 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-5 text-pink-300">Stay Inspired</h3>
             <p className="text-purple-200 mb-4 leading-relaxed">
-              Get weekly creative inspiration, trending pins, and exclusive tips delivered to your inbox!
+              Get weekly creative inspiration, trending files, and exclusive tips delivered to your inbox!
             </p>
             <div className="flex group">
               <input
@@ -140,7 +140,7 @@ const Footer = () => {
                 <span className="font-bold text-pink-300 ml-1">Creative Minds</span>
               </p>
               <p className="text-sm text-purple-300 mt-1">
-                © {currentYear} PinHub. All rights reserved. Crafted with React & Tailwind CSS
+                © {currentYear} FileHub. All rights reserved. Crafted with React & Tailwind CSS
               </p>
             </div>
 
@@ -163,7 +163,7 @@ const Footer = () => {
             {/* Stats */}
             <div className="text-center md:text-right">
               <div className="flex gap-4 text-xs text-purple-300">
-                <span>🚀 10K+ Pins</span>
+                <span>🚀 10K+ Files</span>
                 <span>👥 2K+ Users</span>
                 <span>⭐ 50K+ Likes</span>
               </div>
@@ -176,7 +176,7 @@ const Footer = () => {
               📱 Mobile App Coming Soon!
             </p>
             <p className="text-purple-300 text-sm">
-              Get ready to take your pin collection everywhere you go
+              Get ready to take your file collection everywhere you go
             </p>
           </div>
         </div>

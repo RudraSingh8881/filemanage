@@ -1,21 +1,21 @@
-// src/components/Pin.jsx - ✅ UPDATED
+// src/components/File.jsx - ✅ UPDATED
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Heart, Download } from 'lucide-react';
 
-const Pin = ({ pin, onUpdate }) => {
+const File = ({ file, onUpdate }) => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const { user } = useContext(AuthContext);
   const [hovered, setHovered] = useState(false);
-  const isLiked = user && pin.likedBy?.includes(user.id);
+  const isLiked = user && file.likedBy?.includes(user.id);
 
   const handleLike = async (e) => {
     e.stopPropagation();
     if (!user) return;
     try {
       // Like functionality - you can implement later
-      console.log('Like pin:', pin._id);
+      console.log('Like file:', file._id);
     } catch (err) {
       console.error('Like error:', err);
     }
@@ -28,8 +28,8 @@ const Pin = ({ pin, onUpdate }) => {
       onMouseLeave={() => setHovered(false)}
     >
       <img
-        src={`${API_URL}${pin.image}`}
-        alt={pin.title}
+        src={`${API_URL}${file.image}`}
+        alt={file.title}
         className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110"
       />
 
@@ -43,19 +43,19 @@ const Pin = ({ pin, onUpdate }) => {
               }`}
             >
               <Heart size={18} fill={isLiked ? 'white' : 'none'} />
-              {pin.likes?.length || 0}
+              {file.likes?.length || 0}
             </button>
             <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-sm font-bold">
               <Download size={18} /> Save
             </button>
           </div>
-          <h3 className="text-xl font-bold">{pin.title}</h3>
-          {pin.description && <p className="text-sm opacity-90 mt-1">{pin.description}</p>}
+          <h3 className="text-xl font-bold">{file.title}</h3>
+          {file.description && <p className="text-sm opacity-90 mt-1">{file.description}</p>}
           <div className="flex items-center gap-3 mt-3">
             <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
-              {pin.username?.[0].toUpperCase() || 'U'}
+              {file.username?.[0].toUpperCase() || 'U'}
             </div>
-            <span className="font-medium">{pin.username}</span>
+            <span className="font-medium">{file.username}</span>
           </div>
         </div>
       )}
@@ -63,4 +63,4 @@ const Pin = ({ pin, onUpdate }) => {
   );
 };
 
-export default Pin;
+export default File;

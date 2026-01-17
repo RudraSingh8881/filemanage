@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import API from '../utils/api';
 import { Upload, Camera, AlertCircle } from 'lucide-react';
-import CompressPin from '../components/CompressPin';
+import CompressPin from '../components/Compressfile';
 
 
 
@@ -192,7 +192,7 @@ const CreatePin = () => {
 
           {location.state?.reusePin && !image && (
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-              <p className="text-blue-700 font-medium">Using image from existing pin</p>
+              <p className="text-blue-700 font-medium">Using image from existing file</p>
             </div>
           )}
 

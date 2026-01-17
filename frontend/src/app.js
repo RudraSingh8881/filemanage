@@ -11,7 +11,7 @@ function App() {
       color: 'white',
       fontFamily: 'Arial'
     }}>
-      <h1 style={{ fontSize: '3rem', marginBottom: '20px' }}>🎉 PinHub is Working!</h1>
+      <h1 style={{ fontSize: '3rem', marginBottom: '20px' }}>🎉 FileHub is Working!</h1>
       <p style={{ fontSize: '1.2rem', marginBottom: '30px' }}>Your frontend is running on localhost:3000</p>
       
       <div style={{ background: 'white', padding: '30px', borderRadius: '15px', maxWidth: '500px', margin: '0 auto', color: 'black' }}>

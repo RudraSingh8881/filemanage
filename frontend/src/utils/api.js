@@ -49,7 +49,7 @@ export const logoutUser = () => {
   localStorage.removeItem('userId');
 };
 
-// Pin functions
+// file functions
 export const getPins = async (search = '', page = 1) => {
   const res = await api.get('/pins', { params: { search, page, limit: 12 } });
   return res.data;

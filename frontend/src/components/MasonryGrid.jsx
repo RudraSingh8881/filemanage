@@ -1,6 +1,6 @@
 // src/components/MasonryGrid.jsx - ✅ PERFECT AS IS
 import React from 'react';
-import PinCard from './PinCard';
+import FileCard from './FileCard';
 
 const MasonryGrid = ({ pins, onEdit, onDelete }) => {
   return (
@@ -11,7 +11,7 @@ const MasonryGrid = ({ pins, onEdit, onDelete }) => {
           className="masonry-item"
           ref={pin.ref || null}
         >
-          <PinCard pin={pin} onEdit={onEdit} onDelete={onDelete} />
+          <FileCard pin={pin} onEdit={onEdit} onDelete={onDelete} />
         </div>
       ))}
     </div>

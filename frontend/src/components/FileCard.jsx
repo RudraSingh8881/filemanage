@@ -1,15 +1,15 @@
-// src/components/PinCard.jsx - ✅ UPDATED
+// src/components/FileCard.jsx - ✅ UPDATED
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Heart, Download, Edit2, Trash2 } from 'lucide-react';
 
-const PinCard = ({ pin, onEdit, onDelete }) => {
+const FileCard = ({ file, onEdit, onDelete }) => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const { user } = useContext(AuthContext);
   const [hovered, setHovered] = useState(false);
-  const [liked, setLiked] = useState(pin.likedBy?.includes(user?.id) || false);
-  const isOwner = user?.id === pin.userId?._id || user?.id === pin.userId;
+  const [liked, setLiked] = useState(file.likedBy?.includes(user?.id) || false);
+  const isOwner = user?.id === file.userId?._id || user?.id === file.userId;
 
   const handleLike = async (e) => {
     e.stopPropagation();
@@ -24,13 +24,13 @@ const PinCard = ({ pin, onEdit, onDelete }) => {
 
   return (
     <div
-      className="pin-card group"
+      className="file-card group"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <img
-        src={`${API_URL}${pin.image}`}
-        alt={pin.title}
+        src={`${API_URL}${file.image}`}
+        alt={file.title}
         className="w-full h-auto object-cover rounded-2xl"
       />
 
@@ -52,7 +52,7 @@ const PinCard = ({ pin, onEdit, onDelete }) => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onEdit(pin);
+                    onEdit(file);
                   }}
                   className="p-2 rounded-full bg-blue-600 text-white"
                 >
@@ -61,7 +61,7 @@ const PinCard = ({ pin, onEdit, onDelete }) => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(pin._id);
+                    onDelete(file._id);
                   }}
                   className="p-2 rounded-full bg-red-600 text-white"
                 >
@@ -72,13 +72,13 @@ const PinCard = ({ pin, onEdit, onDelete }) => {
           </div>
 
           <div className="text-white">
-            <div className="font-bold text-lg">{pin.title}</div>
-            {pin.description && <div className="text-sm opacity-90 mt-1">{pin.description}</div>}
+            <div className="font-bold text-lg">{file.title}</div>
+            {file.description && <div className="text-sm opacity-90 mt-1">{file.description}</div>}
             <div className="flex items-center gap-2 mt-2">
               <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {pin.username?.[0]?.toUpperCase() || pin.userId?.username?.[0]?.toUpperCase() || 'U'}
+                {file.username?.[0]?.toUpperCase() || file.userId?.username?.[0]?.toUpperCase() || 'U'}
               </div>
-              <span className="text-sm">{pin.username || pin.userId?.username || 'User'}</span>
+              <span className="text-sm">{file.username || file.userId?.username || 'User'}</span>
             </div>
           </div>
         </div>
@@ -87,4 +87,4 @@ const PinCard = ({ pin, onEdit, onDelete }) => {
   );
 };
 
-export default PinCard;
+export default FileCard;

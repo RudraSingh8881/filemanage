@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Explore from './pages/Explore';
 import Profile from './pages/Profile';
-import CreatePin from './pages/CreatePin';
+import CreatePin from './pages/Createfile';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';

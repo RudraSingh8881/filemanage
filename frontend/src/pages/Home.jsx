@@ -221,13 +221,13 @@ const Home = () => {
             <div className="bg-gradient-to-br from-purple-100 to-pink-100 border-2 border-dashed border-purple-200 rounded-3xl w-64 h-64 mx-auto mb-8 flex items-center justify-center">
               <Sparkles className="text-purple-400" size={64} />
             </div>
-            <h3 className="text-4xl font-bold text-gray-700 mb-4">No pins yet!</h3>
-            <p className="text-2xl text-gray-500 mb-6">Your amazing pins will appear here</p>
+            <h3 className="text-4xl font-bold text-gray-700 mb-4">No files yet!</h3>
+            <p className="text-2xl text-gray-500 mb-6">Your amazing files will appear here</p>
             <button
               onClick={() => window.location.href = '/create'}
               className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:from-purple-700 hover:to-pink-700 transition shadow-lg"
             >
-              Create Your First Pin
+              Create Your First File
             </button>
           </div>
         )}

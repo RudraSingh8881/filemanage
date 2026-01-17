@@ -190,7 +190,7 @@ app.post('/api/login', async (req, res) => {
 
 // === PIN ROUTES ===
 
-// GET ALL PINS – SEARCH + PAGINATION (Used by /explore)
+// GET ALL files – SEARCH + PAGINATION (Used by /explore)
 app.get('/api/pins', async (req, res) => {
   try {
     const { search = '', page = 1, limit = 12 } = req.query;
@@ -237,7 +237,7 @@ app.get('/api/pins', async (req, res) => {
   }
 });
 
-// Create Pin (with authentication)
+// Create files (with authentication)
 app.post('/api/pins', authenticate, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -268,7 +268,7 @@ app.post('/api/pins', authenticate, upload.single('image'), async (req, res) => 
   }
 });
 
-// Get User Pins (Profile)
+// Get User files (Profile)
 app.get('/api/pins/user/:userId', async (req, res) => {
   try {
     console.log(`🔄 Fetching pins for user: ${req.params.userId}`);
@@ -281,7 +281,7 @@ app.get('/api/pins/user/:userId', async (req, res) => {
       console.log(`✅ Found ${pins.length} pins`);
       res.json(pins);
     } else {
-      // Demo mode - return all demo pins (or filter if you have user info)
+      // Demo mode - return all demo files (or filter if you have user info)
       const pins = demoPins;
       console.log(`✅ Demo mode: Found ${pins.length} pins`);
       res.json(pins);
@@ -295,7 +295,7 @@ app.get('/api/pins/user/:userId', async (req, res) => {
   }
 });
 
-// Update Pin (with authentication)
+// Update file (with authentication)
 app.put('/api/pins/:id', authenticate, async (req, res) => {
   try {
     if (mongoose.connection.readyState === 1) {
@@ -316,7 +316,7 @@ app.put('/api/pins/:id', authenticate, async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 });
-// Delete Pin (with authentication)
+// Delete file (with authentication)
 app.delete('/api/pins/:id', authenticate, async (req, res) => {
   try {
     if (mongoose.connection.readyState === 1) {
@@ -337,21 +337,21 @@ app.delete('/api/pins/:id', authenticate, async (req, res) => {
 
 // Add this with your other routes in server.js
 
-// Get user's pin history
-// Get recent pins for history
+// Get user's file history
+// Get recent file for history
 app.get('/api/history', async (req, res) => {
   try {
     let historyPins = [];
 
     if (mongoose.connection.readyState === 1) {
-      // Get recent pins from MongoDB
+      // Get recent files from MongoDB
       historyPins = await Pin.find()
         .sort({ createdAt: -1 })
         .limit(20)
         .populate('userId', 'username')
         .select('title description image userId createdAt');
     } else {
-      // Get from demo pins
+      // Get from demo file
       historyPins = demoPins
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 20)

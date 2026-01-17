@@ -30,19 +30,19 @@ const Navbar = () => {
       console.log('History response:', res);
       
       // Add protection to ensure history persists even if main pins are deleted
-      const protectedHistory = res.slice(0, 20).map(pin => ({
-        ...pin,
+      const protectedHistory = res.slice(0, 20).map(file => ({
+        ...file,
         // This ensures history items are independent of main pins
         isProtectedHistory: true,
         // Store all necessary data for reuse
         historyBackup: {
-          image: pin.image,
-          title: pin.title,
-          description: pin.description,
-          username: pin.username,
-          createdAt: pin.createdAt,
+          image: file.image,
+          title: file.title,
+          description: file.description,
+          username: file.username,
+          createdAt: file.createdAt,
           // Store image file data for reuse
-          imageFile: pin.imageFile || null
+          imageFile: file.imageFile || null
         }
       }));
       
@@ -64,9 +64,9 @@ const Navbar = () => {
     } else {
       const query = searchQuery.toLowerCase();
       setFilteredHistory(
-        history.filter(pin =>
-          pin.title.toLowerCase().includes(query) ||
-          (pin.description && pin.description.toLowerCase().includes(query))
+        history.filter(file =>
+          file.title.toLowerCase().includes(query) ||
+          (file.description && file.description.toLowerCase().includes(query))
         )
       );
     }
@@ -79,45 +79,45 @@ const Navbar = () => {
     }
   }, [showHistory]);
 
-  const handleReuse = async (pin) => {
-    console.log('Reusing pin from history:', pin);
+  const handleReuse = async (file) => {
+    console.log('Reusing file from history:', file);
     
     try {
-      // Use backup data to ensure pin can be reused even if deleted from main
-      const pinToReuse = pin.historyBackup ? { ...pin, ...pin.historyBackup } : pin;
+      // Use backup data to ensure file can be reused even if deleted from main
+      const fileToReuse = file.historyBackup ? { ...file, ...file.historyBackup } : file;
       
       // If image file is not available, try to fetch it
       let imageFile = null;
-      if (!pinToReuse.imageFile) {
+      if (!fileToReuse.imageFile) {
         // Create a blob from the image URL for reuse
-        const response = await fetch(`${API_URL}${pinToReuse.image}`);
+        const response = await fetch(`${API_URL}${fileToReuse.image}`);
         const blob = await response.blob();
-        imageFile = new File([blob], `reused-${pinToReuse.title}.jpg`, { type: 'image/jpeg' });
+        imageFile = new File([blob], `reused-${fileToReuse.title}.jpg`, { type: 'image/jpeg' });
       }
       
       navigate('/create', { 
         state: { 
           reusePin: {
-            ...pinToReuse,
+            ...fileToReuse,
             fromHistory: true,
             // Ensure image path is preserved
-            image: pinToReuse.historyBackup?.image || pinToReuse.image,
+            image: fileToReuse.historyBackup?.image || fileToReuse.image,
             // Pass the image file for immediate reuse
-            imageFile: imageFile || pinToReuse.imageFile
+            imageFile: imageFile || fileToReuse.imageFile
           }
         } 
       });
       setShowHistory(false);
       setSearchQuery('');
     } catch (error) {
-      console.error('Error reusing pin:', error);
+      console.error('Error reusing file:', error);
       // Fallback: navigate without image file
       navigate('/create', { 
         state: { 
           reusePin: {
-            ...pin,
+            ...file,
             fromHistory: true,
-            image: pin.historyBackup?.image || pin.image
+            image: file.historyBackup?.image || file.image
           }
         } 
       });
@@ -126,21 +126,21 @@ const Navbar = () => {
     }
   };
 
-  const handleDeleteFromHistory = async (pinId, e) => {
+  const handleDeleteFromHistory = async (fileId, e) => {
     e.stopPropagation(); // Prevent triggering reuse
-    if (!confirm('Remove this pin from your history? This will not delete the original pin.')) return;
+    if (!confirm('Remove this file from your history? This will not delete the original file.')) return;
     
     try {
       // Remove from local state immediately
-      setHistory(prev => prev.filter(pin => pin._id !== pinId));
-      setFilteredHistory(prev => prev.filter(pin => pin._id !== pinId));
+      setHistory(prev => prev.filter(file => file._id !== fileId));
+      setFilteredHistory(prev => prev.filter(file => file._id !== fileId));
       
-      console.log('Pin removed from history view only');
+      console.log('File removed from history view only');
     } catch (err) {
       console.error('Failed to delete from history:', err);
       // Still remove from local state for better UX
-      setHistory(prev => prev.filter(pin => pin._id !== pinId));
-      setFilteredHistory(prev => prev.filter(pin => pin._id !== pinId));
+      setHistory(prev => prev.filter(file => file._id !== fileId));
+      setFilteredHistory(prev => prev.filter(file => file._id !== fileId));
     }
   };
 
@@ -152,7 +152,7 @@ const Navbar = () => {
   };
 
   const clearAllHistory = async () => {
-    if (!confirm('Clear all your pin history? This will not delete your actual pins, only remove them from this history view.')) return;
+    if (!confirm('Clear all your file history? This will not delete your actual files, only remove them from this history view.')) return;
     
     try {
       // Clear local state only
@@ -176,9 +176,9 @@ const Navbar = () => {
           {/* LOGO */}
           <Link to="/" className="flex items-center gap-2 hover:scale-105 transition-transform">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
-              P
+              R
             </div>
-            <span className="text-2xl font-bold text-purple-600">PinHub</span>
+            <span className="text-2xl font-bold text-purple-600">FileHub</span>
           </Link>
 
           {/* DESKTOP SEARCH BAR */}
@@ -187,7 +187,7 @@ const Navbar = () => {
               <Search className="absolute left-3 top-3 text-gray-400" size={20} />
               <input
                 type="text"
-                placeholder="Search pins..."
+                placeholder="Search files..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
@@ -350,15 +350,15 @@ const Navbar = () => {
                               Click to reuse • 🗑️ Remove from history
                             </p>
                           </div>
-                          {filteredHistory.map((pin, i) => (
+                          {filteredHistory.map((file, i) => (
                             <div
-                              key={pin._id || i}
+                              key={file._id || i}
                               className="flex items-center gap-3 p-3 rounded-xl hover:bg-purple-50 transition cursor-pointer group border border-transparent hover:border-purple-200 relative"
-                              onClick={() => handleReuse(pin)}
+                              onClick={() => handleReuse(file)}
                             >
                               <img
-                                src={`${API_URL}${pin.image}`}
-                                alt={pin.title}
+                                src={`${API_URL}${file.image}`}
+                                alt={file.title}
                                 className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
                                 onError={(e) => {
                                   e.target.src = 'https://via.placeholder.com/48?text=Image';
@@ -366,15 +366,15 @@ const Navbar = () => {
                               />
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-sm text-gray-800 truncate">
-                                  {pin.title || 'Untitled Pin'}
+                                  {file.title || 'Untitled File'}
                                 </p>
-                                {pin.description && (
+                                {file.description && (
                                   <p className="text-xs text-gray-500 truncate">
-                                    {pin.description}
+                                    {file.description}
                                   </p>
                                 )}
                                 <p className="text-xs text-purple-600 mt-1">
-                                  {pin.username || pin.userId?.username || 'Unknown User'}
+                                  {file.username || file.userId?.username || 'Unknown User'}
                                 </p>
                                 <div className="flex items-center gap-1 mt-1">
                                   <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-200">
@@ -388,12 +388,12 @@ const Navbar = () => {
                               <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
                                 <button 
                                   className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-2 rounded-full transition hover:scale-110"
-                                  title="Reuse this pin without recreating"
+                                  title="Reuse this file without recreating"
                                 >
                                   <RotateCcw size={14} />
                                 </button>
                                 <button 
-                                  onClick={(e) => handleDeleteFromHistory(pin._id, e)}
+                                  onClick={(e) => handleDeleteFromHistory(file._id, e)}
                                   className="bg-red-500 text-white p-2 rounded-full transition hover:scale-110 hover:bg-red-600"
                                   title="Remove from history view only"
                                 >
