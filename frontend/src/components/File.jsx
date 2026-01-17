@@ -3,12 +3,15 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Heart, Download } from 'lucide-react';
 
-const File = ({ file, onUpdate }) => {
+const File = ({ file, pin, onUpdate }) => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  // Support both 'pin' and 'file' prop names
+  const currentFile = file || pin || {};
 
   const { user } = useContext(AuthContext);
   const [hovered, setHovered] = useState(false);
-  const isLiked = user && file.likedBy?.includes(user.id);
+  const isLiked = user && currentFile.likedBy?.includes(user.id);
 
   const handleLike = async (e) => {
     e.stopPropagation();
@@ -28,8 +31,8 @@ const File = ({ file, onUpdate }) => {
       onMouseLeave={() => setHovered(false)}
     >
       <img
-        src={`${API_URL}${file.image}`}
-        alt={file.title}
+        src={`${API_URL}${currentFile.image}`}
+        alt={currentFile.title}
         className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-110"
       />
 
@@ -43,19 +46,19 @@ const File = ({ file, onUpdate }) => {
               }`}
             >
               <Heart size={18} fill={isLiked ? 'white' : 'none'} />
-              {file.likes?.length || 0}
+              {currentFile.likes?.length || 0}
             </button>
             <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm text-sm font-bold">
               <Download size={18} /> Save
             </button>
           </div>
-          <h3 className="text-xl font-bold">{file.title}</h3>
-          {file.description && <p className="text-sm opacity-90 mt-1">{file.description}</p>}
+          <h3 className="text-xl font-bold">{currentFile.title}</h3>
+          {currentFile.description && <p className="text-sm opacity-90 mt-1">{currentFile.description}</p>}
           <div className="flex items-center gap-3 mt-3">
             <div className="w-9 h-9 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
-              {file.username?.[0].toUpperCase() || 'U'}
+              {currentFile.username?.[0].toUpperCase() || 'U'}
             </div>
-            <span className="font-medium">{file.username}</span>
+            <span className="font-medium">{currentFile.username}</span>
           </div>
         </div>
       )}

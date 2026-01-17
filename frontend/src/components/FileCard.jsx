@@ -3,13 +3,16 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { Heart, Download, Edit2, Trash2 } from 'lucide-react';
 
-const FileCard = ({ file, onEdit, onDelete }) => {
+const FileCard = ({ pin, file, onEdit, onDelete }) => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  
+  // Support both 'pin' and 'file' prop names for flexibility
+  const currentFile = file || pin || {};
 
   const { user } = useContext(AuthContext);
   const [hovered, setHovered] = useState(false);
-  const [liked, setLiked] = useState(file.likedBy?.includes(user?.id) || false);
-  const isOwner = user?.id === file.userId?._id || user?.id === file.userId;
+  const [liked, setLiked] = useState(currentFile.likedBy?.includes(user?.id) || false);
+  const isOwner = user?.id === currentFile.userId?._id || user?.id === currentFile.userId;
 
   const handleLike = async (e) => {
     e.stopPropagation();
@@ -29,8 +32,8 @@ const FileCard = ({ file, onEdit, onDelete }) => {
       onMouseLeave={() => setHovered(false)}
     >
       <img
-        src={`${API_URL}${file.image}`}
-        alt={file.title}
+        src={`${API_URL}${currentFile.image}`}
+        alt={currentFile.title}
         className="w-full h-auto object-cover rounded-2xl"
       />
 
@@ -52,7 +55,7 @@ const FileCard = ({ file, onEdit, onDelete }) => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onEdit(file);
+                    onEdit(currentFile);
                   }}
                   className="p-2 rounded-full bg-blue-600 text-white"
                 >
@@ -61,7 +64,7 @@ const FileCard = ({ file, onEdit, onDelete }) => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(file._id);
+                    onDelete(currentFile._id);
                   }}
                   className="p-2 rounded-full bg-red-600 text-white"
                 >
@@ -72,13 +75,13 @@ const FileCard = ({ file, onEdit, onDelete }) => {
           </div>
 
           <div className="text-white">
-            <div className="font-bold text-lg">{file.title}</div>
-            {file.description && <div className="text-sm opacity-90 mt-1">{file.description}</div>}
+            <div className="font-bold text-lg">{currentFile.title}</div>
+            {currentFile.description && <div className="text-sm opacity-90 mt-1">{currentFile.description}</div>}
             <div className="flex items-center gap-2 mt-2">
               <div className="w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                {file.username?.[0]?.toUpperCase() || file.userId?.username?.[0]?.toUpperCase() || 'U'}
+                {currentFile.username?.[0]?.toUpperCase() || currentFile.userId?.username?.[0]?.toUpperCase() || 'U'}
               </div>
-              <span className="text-sm">{file.username || file.userId?.username || 'User'}</span>
+              <span className="text-sm">{currentFile.username || currentFile.userId?.username || 'User'}</span>
             </div>
           </div>
         </div>
