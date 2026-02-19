@@ -17,13 +17,26 @@ const uploadApi = axios.create({
 
 // Request interceptors
 [api, uploadApi].forEach(instance => {
-  instance.interceptors.request.use(config => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+  instance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem("token");
+
+      // Prevent sending invalid tokens
+      if (
+        token &&
+        token !== "null" &&
+        token !== "undefined" &&
+        token.trim() !== ""
+      ) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+      } else {
+        delete config.headers["Authorization"];
+      }
+
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
 });
 
 // Auth functions - ✅ REMOVED DEMO FALLBACKS
