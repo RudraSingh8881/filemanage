@@ -12,15 +12,14 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ CORS Configuration
-// Allow configuring one or more frontend origins via `FRONTEND_URL` (comma-separated)
-// Example for dev: FRONTEND_URL=http://localhost:3000,https://pinterest-clone-frontend-kp8s.onrender.com
+// ========================
+// ✅ CORS CONFIG
+// ========================
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const FRONTEND_ORIGINS = FRONTEND_URL.split(',').map(s => s.trim()).filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     if (FRONTEND_ORIGINS.includes(origin)) return callback(null, true);
     return callback(new Error('CORS policy: This origin is not allowed'));
@@ -29,17 +28,23 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-// ✅ Multer for image upload (YOUR EXISTING CODE - KEEP AS IS)
+// ========================
+// ✅ MULTER
+// ========================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+  filename: (req, file, cb) =>
+    cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage });
 
-// ✅ MongoDB Connection (YOUR EXISTING CODE - KEEP AS IS)
+// ========================
+// ✅ DATABASE
+// ========================
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch(err => {
@@ -47,7 +52,9 @@ mongoose.connect(process.env.MONGODB_URI)
     console.log('Using Demo Mode (data resets on restart)');
   });
 
-// ✅ Schemas (YOUR EXISTING CODE - KEEP AS IS)
+// ========================
+// ✅ SCHEMAS
+// ========================
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true },
   email: { type: String, unique: true, required: true },
@@ -64,98 +71,44 @@ const PinSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 const Pin = mongoose.model('Pin', PinSchema);
 
-// ✅ Demo Mode Fallback (YOUR EXISTING CODE - KEEP AS IS)
 let demoPins = [];
 
-// ✅ JWT Middleware (YOUR EXISTING CODE - KEEP AS IS)
+// ========================
+// ✅ FIXED AUTH MIDDLEWARE
+// ========================
 const authenticate = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ msg: 'No token' });
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ msg: 'No token provided' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ msg: 'Invalid token format' });
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = decoded; // { id: ... }
     next();
   } catch (err) {
-    res.status(401).json({ msg: 'Invalid token' });
+    return res.status(401).json({ msg: 'Token expired or invalid' });
   }
 };
 
 // ========================
-// ✅ NEW UPLOAD ROUTES ADD HERE
+// ✅ TEST
 // ========================
-
-// Upload image to uploads/ folder
-app.post('/api/upload/image', upload.single('image'), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-
-    const fileUrl = `/uploads/${req.file.filename}`;
-    
-    res.json({
-      message: 'File uploaded successfully to uploads/ folder',
-      file: {
-        filename: req.file.filename,
-        originalName: req.file.originalname,
-        size: req.file.size,
-        url: fileUrl,
-        path: req.file.path
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Get all uploaded files from uploads/ folder
-app.get('/api/upload/files', (req, res) => {
-  try {
-    const uploadsDir = path.join(__dirname, 'uploads');
-    const files = fs.readdirSync(uploadsDir);
-    const fileList = files.map(file => {
-      const filePath = path.join(uploadsDir, file);
-      const stats = fs.statSync(filePath);
-      return {
-        name: file,
-        size: stats.size,
-        created: stats.birthtime,
-        url: `/uploads/${file}`
-      };
-    });
-    
-    res.json({ files: fileList });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Test route to check uploads folder contents
-app.get('/api/uploads-list', (req, res) => {
-  try {
-    const uploadsDir = path.join(__dirname, 'uploads');
-    const files = fs.readdirSync(uploadsDir);
-    res.json({ 
-      message: `Found ${files.length} files in uploads folder`,
-      files: files 
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// ========================
-// ✅ YOUR EXISTING ROUTES (KEEP ALL AS IS)
-// ========================
-
-// === TEST ROUTE ===
 app.get('/api/test', (req, res) => res.json({ msg: 'API Working!' }));
 
-// === AUTH ROUTES ===
-// Register
+// ========================
+// ✅ AUTH ROUTES
+// ========================
 app.post('/api/register', async (req, res) => {
   const { username, email, password } = req.body;
+
   try {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ msg: 'User already exists' });
@@ -164,16 +117,25 @@ app.post('/api/register', async (req, res) => {
     user = new User({ username, email, password: hashed });
     await user.save();
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, username, email } });
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: { id: user._id, username, email }
+    });
+
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
 });
 
-// Login
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
@@ -181,16 +143,25 @@ app.post('/api/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ msg: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, username: user.username, email } });
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      token,
+      user: { id: user._id, username: user.username, email }
+    });
+
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
 });
 
-// === PIN ROUTES ===
-
-// GET ALL files – SEARCH + PAGINATION (Used by /explore)
+// ========================
+// ✅ GET ALL PINS
+// ========================
 app.get('/api/pins', async (req, res) => {
   try {
     const { search = '', page = 1, limit = 12 } = req.query;
@@ -198,8 +169,6 @@ app.get('/api/pins', async (req, res) => {
     const searchRegex = new RegExp(search.trim(), 'i');
 
     let pins = [];
-    let total = 0;
-    let hasMore = false;
 
     if (mongoose.connection.readyState === 1) {
       const query = search
@@ -209,170 +178,122 @@ app.get('/api/pins', async (req, res) => {
       pins = await Pin.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(parseInt(limit) + 1)
+        .limit(parseInt(limit))
         .populate('userId', 'username');
 
-      total = await Pin.countDocuments(query);
-      hasMore = pins.length > parseInt(limit);
-      if (hasMore) pins = pins.slice(0, parseInt(limit));
     } else {
-      const filtered = demoPins.filter(p =>
-        !search ||
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        (p.description && p.description.toLowerCase().includes(search.toLowerCase()))
-      );
-
-      pins = filtered
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(skip, skip + parseInt(limit));
-
-      total = filtered.length;
-      hasMore = skip + pins.length < total;
+      pins = demoPins.slice(skip, skip + parseInt(limit));
     }
 
-    res.json({ pins, total, hasMore });
+    res.json({ pins });
+
   } catch (err) {
-    console.error('GET /api/pins error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Create files (with authentication)
+// ========================
+// ✅ CREATE PIN
+// ========================
 app.post('/api/pins', authenticate, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ msg: 'Image file is required' });
+      return res.status(400).json({ msg: 'Image required' });
     }
 
     const pinData = {
       title: req.body.title,
       description: req.body.description || '',
       image: `/uploads/${req.file.filename}`,
-      userId: req.user.id // Use authenticated user's ID
+      userId: req.user.id
     };
 
-    if (mongoose.connection.readyState === 1) {
-      const newPin = new Pin(pinData);
-      await newPin.save();
-      const populated = await Pin.findById(newPin._id).populate('userId', 'username');
-      res.status(201).json(populated);
-    } else {
-      // Demo mode fallback
-      const demoPin = { ...pinData, _id: Date.now().toString(), createdAt: new Date(), userId: { _id: req.user.id, username: 'demo_user' } };
-      demoPins.push(demoPin);
-      res.status(201).json(demoPin);
-    }
+    const newPin = new Pin(pinData);
+    await newPin.save();
+
+    const populated = await Pin.findById(newPin._id).populate('userId', 'username');
+    res.status(201).json(populated);
+
   } catch (err) {
-    console.error('Pin creation error:', err);
     res.status(500).json({ msg: err.message });
   }
 });
 
-// Get User files (Profile)
-app.get('/api/pins/user/:userId', async (req, res) => {
-  try {
-    console.log(`🔄 Fetching pins for user: ${req.params.userId}`);
-    
-    if (mongoose.connection.readyState === 1) {
-      const pins = await Pin.find({ userId: req.params.userId })
-        .sort({ createdAt: -1 })
-        .populate('userId', 'username');
-      
-      console.log(`✅ Found ${pins.length} pins`);
-      res.json(pins);
-    } else {
-      // Demo mode - return all demo files (or filter if you have user info)
-      const pins = demoPins;
-      console.log(`✅ Demo mode: Found ${pins.length} pins`);
-      res.json(pins);
-    }
-  } catch (err) {
-    console.error('❌ Error in /api/pins/user/:userId:', err.message);
-    res.status(500).json({ 
-      msg: 'Failed to load user pins',
-      error: err.message 
-    });
-  }
-});
-
-// Update file (with authentication)
+// ========================
+// ✅ UPDATE PIN (FIXED HERE)
+// ========================
 app.put('/api/pins/:id', authenticate, async (req, res) => {
   try {
-    if (mongoose.connection.readyState === 1) {
-      let pin = await Pin.findById(req.params.id);
-      if (!pin) return res.status(404).json({ msg: 'Pin not found' });
-      if (pin.userId.toString() !== req.user.id) return res.status(401).json({ msg: 'Not authorized' });
+    const pin = await Pin.findById(req.params.id);
+    if (!pin) return res.status(404).json({ msg: 'Pin not found' });
 
-      pin = await Pin.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      res.json(pin);
-    } else {
-      const index = demoPins.findIndex(p => p._id === req.params.id);
-      if (index === -1) return res.status(404).json({ msg: 'Not found' });
-      // Add auth check for demo mode if needed
-      demoPins[index] = { ...demoPins[index], ...req.body };
-      res.json(demoPins[index]);
+    // 🔥 FIXED COMPARISON
+    if (!pin.userId.equals(req.user.id)) {
+      return res.status(401).json({ msg: 'Not authorized: not owner' });
     }
+
+    const updated = await Pin.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    res.json(updated);
+
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
 });
-// Delete file (with authentication)
+
+// ========================
+// ✅ DELETE PIN (FIXED HERE)
+// ========================
 app.delete('/api/pins/:id', authenticate, async (req, res) => {
   try {
-    if (mongoose.connection.readyState === 1) {
-      const pin = await Pin.findById(req.params.id);
-      if (!pin) return res.status(404).json({ msg: 'Pin not found' });
-      if (pin.userId.toString() !== req.user.id) return res.status(401).json({ msg: 'Not authorized' });
+    const pin = await Pin.findById(req.params.id);
+    if (!pin) return res.status(404).json({ msg: 'Pin not found' });
 
-      await Pin.findByIdAndDelete(req.params.id);
-      res.json({ msg: 'Deleted' });
-    } else {
-      demoPins = demoPins.filter(p => p._id !== req.params.id);
-      res.json({ msg: 'Deleted' });
+    // 🔥 FIXED COMPARISON
+    if (!pin.userId.equals(req.user.id)) {
+      return res.status(401).json({ msg: 'Not authorized: not owner' });
     }
+
+    await Pin.findByIdAndDelete(req.params.id);
+    res.json({ msg: 'Deleted successfully' });
+
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
 });
 
-// Add this with your other routes in server.js
-
-// Get user's file history
-// Get recent file for history
-app.get('/api/history', async (req, res) => {
+// GET USER HISTORY
+app.get('/api/history', authenticate, async (req, res) => {
   try {
-    let historyPins = [];
+    const pins = await Pin.find({ userId: req.user.id })
+      .sort({ createdAt: -1 });
 
-    if (mongoose.connection.readyState === 1) {
-      // Get recent files from MongoDB
-      historyPins = await Pin.find()
-        .sort({ createdAt: -1 })
-        .limit(20)
-        .populate('userId', 'username')
-        .select('title description image userId createdAt');
-    } else {
-      // Get from demo file
-      historyPins = demoPins
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 20)
-        .map(pin => ({
-          ...pin,
-          username: 'demo_user' // Add username for demo
-        }));
-    }
-
-    res.json(historyPins);
+    res.json(pins);
   } catch (err) {
-    console.error('History error:', err);
-    res.status(500).json({ message: 'Error loading history' });
+    res.status(500).json({ msg: err.message });
   }
 });
 
-// ✅ Create uploads folder (YOUR EXISTING CODE - KEEP AS IS)
+// GET PINS BY USER
+app.get('/api/pins/user/:userId', authenticate, async (req, res) => {
+  try {
+    const pins = await Pin.find({ userId: req.params.userId })
+      .sort({ createdAt: -1 });
+
+    res.json(pins);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+
+// ========================
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
 
-// ✅ Start Server (YOUR EXISTING CODE - KEEP AS IS)
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Test: http://localhost:${PORT}/api/test`);
 });

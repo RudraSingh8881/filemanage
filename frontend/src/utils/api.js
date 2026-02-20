@@ -1,9 +1,5 @@
-// src/utils/api.js - FINAL CORRECTED VERSION (NO DEMO FALLBACKS)
 import axios from 'axios';
 
-// Use Vite environment variable `VITE_API_URL` when deployed.
-// If not set, fall back to a relative `/api` so the app works when
-// frontend and backend are hosted on the same origin.
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const apiBase = `${API_URL.replace(/\/+$/, '')}/api`;
 
@@ -15,22 +11,17 @@ const uploadApi = axios.create({
   baseURL: apiBase,
 });
 
-// Request interceptors
-[api, uploadApi].forEach(instance => {
+[api, uploadApi].forEach((instance) => {
   instance.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem("token");
 
-      // Prevent sending invalid tokens
-      if (
-        token &&
-        token !== "null" &&
-        token !== "undefined" &&
-        token.trim() !== ""
-      ) {
-        config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers = config.headers || {};
+
+      if (token && token !== "null" && token !== "undefined" && token.trim() !== "") {
+        config.headers.Authorization = `Bearer ${token}`;
       } else {
-        delete config.headers["Authorization"];
+        delete config.headers.Authorization;
       }
 
       return config;
@@ -39,11 +30,23 @@ const uploadApi = axios.create({
   );
 });
 
-// Auth functions - ✅ REMOVED DEMO FALLBACKS
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err.response && err.response.status === 401) {
+      console.log("Token expired or unauthorized — logging out");
+      localStorage.clear();
+      window.location.href = "/login";
+    }
+    return Promise.reject(err);
+  }
+);
+
+// AUTH
 export const loginUser = async (email, password) => {
   const res = await api.post('/login', { email, password });
   localStorage.setItem('token', res.data.token);
-  localStorage.setItem('userId', res.data.user.id); // Add this
+  localStorage.setItem('userId', res.data.user.id);
   localStorage.setItem('user', JSON.stringify(res.data.user));
   return res.data.user;
 };
@@ -51,7 +54,7 @@ export const loginUser = async (email, password) => {
 export const registerUser = async (username, email, password) => {
   const res = await api.post('/register', { username, email, password });
   localStorage.setItem('token', res.data.token);
-  localStorage.setItem('userId', res.data.user.id); // Add this
+  localStorage.setItem('userId', res.data.user.id);
   localStorage.setItem('user', JSON.stringify(res.data.user));
   return res.data.user;
 };
@@ -62,7 +65,8 @@ export const logoutUser = () => {
   localStorage.removeItem('userId');
 };
 
-// file functions
+// FILES
+// PINS (CORRECT ROUTES)
 export const getPins = async (search = '', page = 1) => {
   const res = await api.get('/pins', { params: { search, page, limit: 12 } });
   return res.data;
@@ -90,15 +94,12 @@ export const deletePin = async (pinId) => {
   return res.data;
 };
 
-// History function
 export const getHistory = async () => {
   const res = await api.get('/history');
   return res.data;
 };
 
-
-// Default export
-const API = {
+export default {
   loginUser,
   registerUser,
   logoutUser,
@@ -109,5 +110,3 @@ const API = {
   deletePin,
   getHistory
 };
-
-export default API;

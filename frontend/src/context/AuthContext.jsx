@@ -8,18 +8,25 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+  try {
     const token = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
-    if (token && savedUser) {
-      const userData = JSON.parse(savedUser);
-      setUser(userData);
-      // Also store userId separately for consistency
-      if (userData.id) {
-        localStorage.setItem('userId', userData.id);
-      }
+
+    if (!token || token === "null" || token === "undefined") {
+      logout();
+      setLoading(false);
+      return;
     }
-    setLoading(false);
-  }, []);
+
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  } catch (err) {
+    console.log("Auth restore error", err);
+    logout();
+  }
+  setLoading(false);
+}, []);
 
   const login = async (email, password) => {
     try {
